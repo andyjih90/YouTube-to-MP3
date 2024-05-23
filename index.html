@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to MP3 Converter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>YouTube to MP3 Converter</h1>
+    </header>
+    <main>
+        <form id="converter-form" action="/convert" method="POST">
+            <label for="youtube-url">Enter YouTube URL:</label>
+            <input type="url" id="youtube-url" name="youtube-url" required>
+            <button type="submit">Convert</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2024 YouTube to MP3 Converter</p>
+    </footer>
+</body>
+</html>
