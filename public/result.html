@@ -11,23 +11,26 @@
 </head>
 
 <body>
-    <header>
+    <header class="d-flex align-items-center justify-content-between">
         <nav>
-            <a href="/" class="btn btn-dark">Home<a>
+            <a href="/" class="btn btn-dark home-button">Home</a>
         </nav>
-        <h2 class="title-font">YouTube to MP3 Converter</h2>
+        <h2 class="title-font text-dark">YouTube to MP3 Converter</h2>
+        <div>
+
+        </div>
     </header>
     <main>
-        <div class="container">
-            <div class="card">
-                <img id="thumbnail" class="card-img-top" alt="Thumbnail">
-                <div class="card-body">
-                    <h5 id="videoTitle" class="card-title"></h5>
-                    <p class="card-text">by <span id="channelName"></span>, <span id="views"></span> views</p>
-                    <a id="downloadLink" class="btn btn-success">Download MP3</a>
-                </div>
+        <div class="card custom-card-download container-fluid">
+            <img id="thumbnail" class="card-img-top" alt="Thumbnail">
+            <div class="card-body">
+                <h5 id="videoTitle" class="card-title"></h5>
+                <p class="card-text">by <span id="channelName"></span> <span id="views"></span> views
+                </p>
+                <a id="downloadLink" class="btn btn-success">Download MP3</a>
             </div>
         </div>
+
     </main>
     <footer>
         <p>&copy; 2024 YouTube to MP3 Converter</p>
