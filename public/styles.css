@@ -101,6 +101,10 @@ button:hover {
   background-color: #0056b3;
 }
 
+.btn-success {
+  margin-top: 20px; /* Adjust the value as needed */
+}
+
 /* Alert Styles */
 .alert {
   margin-bottom: 1em;
