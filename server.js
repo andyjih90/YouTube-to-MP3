@@ -9,11 +9,14 @@ const axios = require("axios");
 const app = express();
 const port = 3000;
 
+let conversionInProgress = false;
+
 if (!fs.existsSync("./downloads")) {
   fs.mkdirSync("./downloads");
 }
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
@@ -26,7 +29,6 @@ function sanitizeFilename(filename) {
 
 app.post("/convert", async (req, res) => {
   const youtubeUrl = req.body["youtube-url"];
-  const videoId = youtubeUrl.split("v=")[1];
 
   console.log("Received request to convert:", youtubeUrl);
 
@@ -61,6 +63,8 @@ app.post("/convert", async (req, res) => {
       `${safeTitle}.mp3`
     );
 
+    conversionInProgress = true;
+
     const stream = ytdl(youtubeUrl, { quality: "highestaudio" });
     ffmpeg(stream)
       .audioBitrate(128)
@@ -82,11 +86,10 @@ app.post("/convert", async (req, res) => {
         NodeID3.write(tags, outputFilePath, (err) => {
           if (err) {
             console.error("Error writing ID3 tags:", err);
-            return res.redirect(
-              `/?error=${encodeURIComponent(
-                "Error writing ID3 tags. Please try again."
-              )}`
-            );
+            conversionInProgress = false;
+            return res
+              .status(500)
+              .json({ error: "Error writing ID3 tags. Please try again." });
           }
 
           const writtenTags = NodeID3.read(outputFilePath);
@@ -96,33 +99,38 @@ app.post("/convert", async (req, res) => {
           const thumbnailUrl = info.videoDetails.thumbnails[0]?.url;
           console.log("Thumbnail URL:", thumbnailUrl);
 
-          res.redirect(
-            `/result.html?title=${encodeURIComponent(
+          conversionInProgress = false;
+          res.json({
+            message: "Conversion completed!",
+            downloadUrl: `/result.html?title=${encodeURIComponent(
               title
             )}&channel=${encodeURIComponent(artist)}&views=${
               info.videoDetails.viewCount
             }&thumbnail=${encodeURIComponent(
               thumbnailUrl
-            )}&file=${encodeURIComponent(outputFilePath)}`
-          );
+            )}&file=${encodeURIComponent(outputFilePath)}`,
+          });
         });
       })
       .on("error", (err) => {
         console.error("Conversion error:", err);
-        res.redirect(
-          `/?error=${encodeURIComponent(
-            "Conversion error. Please enter a valid link and try again."
-          )}`
-        );
+        conversionInProgress = false;
+        res.status(500).json({
+          error: "Conversion error. Please enter a valid link and try again.",
+        });
       });
   } catch (error) {
     console.error("Conversion error:", error);
-    res.redirect(
-      `/?error=${encodeURIComponent(
-        "Conversion error. Please enter a valid link and try again."
-      )}`
-    );
+    conversionInProgress = false;
+    res.status(500).json({
+      error: "Conversion error. Please enter a valid link and try again.",
+    });
   }
+});
+
+// Endpoint to check the conversion status
+app.get("/status", (req, res) => {
+  res.json({ conversionInProgress });
 });
 
 // Endpoint to handle file download
