@@ -16,21 +16,43 @@
             <a href="/" class="btn btn-dark home-button">Home</a>
         </nav>
         <h2 class="title-font text-dark">YouTube to MP3 Converter</h2>
-        <div>
-
-        </div>
+        <div></div>
     </header>
     <main>
-        <div class="card custom-card-download container-fluid">
-            <img id="thumbnail" class="card-img-top" alt="Thumbnail">
-            <div class="card-body">
-                <h5 id="videoTitle" class="card-title"></h5>
-                <p class="card-text">by <span id="channelName"></span> <span id="views"></span> views
-                </p>
-                <a id="downloadLink" class="btn btn-success">Download MP3</a>
+        <div class="row gap-4">
+            <!-- Conversion Form -->
+            <div class="card custom-card container-fluid">
+                <div class="card-body">
+                    <div id="error-message"></div>
+                    <form action="/convert" method="POST" class="form-container d-flex flex-column gap-2">
+                        <div class="mb-3">
+                            <label for="youtube-url" class="form-label">Enter YouTube URL:</label>
+                            <input type="text" class="form-control" id="youtube-url" name="youtube-url" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Convert</button>
+                    </form>
+                </div>
+            </div>
+
+            <!--Download Card-->
+            <div class="card custom-card-download container-fluid">
+                <div class="row g-0 align-items-center">
+                    <div class="col-4">
+                        <img id="thumbnail" class="img-fluid rounded-start" alt="Thumbnail">
+                    </div>
+                    <div class="col-8">
+                        <div class="card-body">
+                            <h5 id="videoTitle" class="card-title">Video Title</h5>
+                            <p class="card-text">
+                                by <span id="channelName">Channel Name</span> /
+                                <span id="views">217,428,219</span> views
+                            </p>
+                            <a id="downloadLink" class="btn btn-success">Download MP3</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </main>
     <footer>
         <p>&copy; 2024 YouTube to MP3 Converter</p>
@@ -43,22 +65,30 @@
         const views = urlParams.get('views');
         const thumbnailUrl = urlParams.get('thumbnail');
         const file = urlParams.get('file');
+        const error = urlParams.get('error');
 
         // Format views with commas
         const formattedViews = Number(views).toLocaleString();
 
         // Populate metadata
-        const thumbnailElement = document.getElementById('thumbnail');
-        if (thumbnailUrl && thumbnailUrl !== 'null') {
-            thumbnailElement.src = decodeURIComponent(thumbnailUrl);
+        if (error) {
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'alert alert-danger';
+            errorMessage.textContent = error;
+            document.getElementById('error-message').appendChild(errorMessage);
         } else {
-            thumbnailElement.src = 'default-thumbnail.png'; // Set a default image if thumbnail URL is not available
+            const thumbnailElement = document.getElementById('thumbnail');
+            if (thumbnailUrl && thumbnailUrl !== 'null') {
+                thumbnailElement.src = decodeURIComponent(thumbnailUrl);
+            } else {
+                thumbnailElement.src = 'default-thumbnail.png'; // Set a default image if thumbnail URL is not available
+            }
+            thumbnailElement.alt = decodeURIComponent(videoTitle);
+            document.getElementById('videoTitle').textContent = decodeURIComponent(videoTitle);
+            document.getElementById('channelName').textContent = decodeURIComponent(channelName);
+            document.getElementById('views').textContent = formattedViews;
+            document.getElementById('downloadLink').href = `/download?file=${encodeURIComponent(file)}`;
         }
-        thumbnailElement.alt = decodeURIComponent(videoTitle);
-        document.getElementById('videoTitle').textContent = decodeURIComponent(videoTitle);
-        document.getElementById('channelName').textContent = decodeURIComponent(channelName);
-        document.getElementById('views').textContent = formattedViews;
-        document.getElementById('downloadLink').href = `/download?file=${encodeURIComponent(file)}`;
     </script>
 </body>
 
