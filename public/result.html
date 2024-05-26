@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -24,17 +29,22 @@
             <div class="card custom-card container-fluid">
                 <div class="card-body">
                     <div id="error-message"></div>
-                    <form action="/convert" method="POST" class="form-container d-flex flex-column gap-2">
+                    <form id="convertForm" class="form-container d-flex flex-column gap-2">
                         <div class="mb-3">
                             <label for="youtube-url" class="form-label">Enter YouTube URL:</label>
                             <input type="text" class="form-control" id="youtube-url" name="youtube-url" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Convert</button>
                     </form>
+                    <div id="progressBar" class="progress mt-3 hidden">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                            style="width: 0%;"></div>
+                    </div>
+                    <p id="status" class="mt-2"></p>
                 </div>
             </div>
 
-            <!--Download Card-->
+            <!-- Download Card -->
             <div class="card custom-card-download container-fluid">
                 <div class="row g-0 align-items-center">
                     <div class="col-4">
@@ -58,6 +68,101 @@
         <p>&copy; 2024 YouTube to MP3 Converter</p>
     </footer>
     <script>
+        document.getElementById('convertForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            startConversion();
+        });
+
+        const resetForm = () => {
+            const progressBarContainer = document.getElementById('progressBar');
+            const progressBar = document.querySelector('.progress-bar');
+            const status = document.getElementById('status');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            progressBarContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            status.innerText = '';
+            errorMessageDiv.innerHTML = '';
+        };
+
+        const startConversion = () => {
+            resetForm();
+
+            const videoUrl = document.getElementById('youtube-url').value;
+            const progressBarContainer = document.getElementById('progressBar');
+            const progressBar = document.querySelector('.progress-bar');
+            const status = document.getElementById('status');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            // Show progress bar and status message immediately
+            progressBarContainer.classList.remove('hidden');
+            status.innerText = 'Starting conversion...';
+
+            let progress = 0;
+            const fakeProgressInterval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+
+                if (progress >= 90) {
+                    clearInterval(fakeProgressInterval);
+                }
+            }, 1000);
+
+            fetch('/convert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'youtube-url': videoUrl })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Please enter a valid link.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const checkCompletion = setInterval(() => {
+                        fetch('/status')
+                            .then(response => response.json())
+                            .then(statusData => {
+                                if (!statusData.conversionInProgress) {
+                                    clearInterval(checkCompletion);
+                                    progressBar.style.width = '100%';
+                                    status.innerText = 'Conversion completed! Redirecting to download...';
+                                    clearInterval(fakeProgressInterval);
+                                    setTimeout(() => {
+                                        resetForm();
+                                        window.location.href = data.downloadUrl;
+                                    }, 2000); // Redirect after a short delay
+                                } else {
+                                    const currentWidth = parseFloat(progressBar.style.width);
+                                    if (currentWidth < 90) {
+                                        progressBar.style.width = `${currentWidth + 10}%`;
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking status:', error);
+                                clearInterval(checkCompletion);
+                                clearInterval(fakeProgressInterval);
+                                progressBarContainer.classList.add('hidden');
+                                const errorMessage = document.createElement('div');
+                                errorMessage.className = 'alert alert-danger';
+                                errorMessage.textContent = `Error: ${error.message}`;
+                                errorMessageDiv.appendChild(errorMessage);
+                            });
+                    }, 1000);
+                })
+                .catch(error => {
+                    status.innerText = '';
+                    clearInterval(fakeProgressInterval);
+                    progressBarContainer.classList.add('hidden');
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'alert alert-danger';
+                    errorMessage.textContent = `Error: ${error.message}`;
+                    errorMessageDiv.appendChild(errorMessage);
+                });
+        };
+
         // Parse URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const videoTitle = urlParams.get('title');
