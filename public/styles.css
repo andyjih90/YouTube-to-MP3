@@ -1,120 +1,139 @@
 /* Global Styles */
+/* Basic styles applied to the entire page */
 body {
-  font-family: cursive;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  font-family: cursive; /* Sets the font family for the entire page */
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+  display: flex; /* Sets a flexbox layout for the body */
+  flex-direction: column; /* Arranges children in a column */
+  min-height: 100vh; /* Ensures the body takes at least the full viewport height */
 }
 
 /* Title Font */
+/* Styles for the title text */
 .title-font {
-  font-family: "Oswald", sans-serif;
-  font-size: 3rem;
-  font-weight: 700;
-  color: #ffffff;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  font-family: "Oswald", sans-serif; /* Uses Oswald font from Google Fonts */
+  font-size: 3rem; /* Sets the font size */
+  font-weight: 700; /* Sets the font weight to bold */
+  color: #ffffff; /* Sets the font color to white */
+  text-align: center; /* Centers the text */
+  margin-top: 20px; /* Adds top margin */
+  margin-bottom: 20px; /* Adds bottom margin */
 }
 
 /* Header Styles */
+/* Styles for the header */
 header {
-  background-color: #cd201f;
-  color: white;
-  padding: 0.5em;
-  text-align: center;
-  /* position: relative; */
+  background-color: #cd201f; /* Sets the background color */
+  color: white; /* Sets the text color */
+  padding: 0.5em; /* Adds padding */
+  text-align: center; /* Centers the text */
 }
 
 /* Main Content Styles */
+/* Styles for the main content area */
 main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2em;
-}
-
-/* Form Container Styles */
-.content {
-  flex: 1;
-}
-
-.custom-card {
-  max-width: 800px;
-}
-
-.custom-card-download {
-  max-width: 300px;
-}
-
-/* Form Styles */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1em;
-}
-
-label {
-  font-weight: bold;
-}
-
-input[type="text"] {
-  padding: 0.5em;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
-  padding: 0.5em;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.btn-success {
-  margin-top: 20px;
-}
-
-/* Alert Styles */
-.alert {
-  margin-bottom: 1em;
-  padding: 1em;
-  border: 1px solid transparent;
-  border-radius: 4px;
-}
-
-.alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  flex: 1; /* Allows the main to grow and take available space */
+  display: flex; /* Sets a flexbox layout */
+  flex-direction: column; /* Arranges children in a column */
+  justify-content: center; /* Centers children horizontally */
+  align-items: center; /* Centers children vertically */
+  gap: 2em; /* Adds space between children */
+  padding: 2em; /* Adds padding */
 }
 
 /* Footer Styles */
+/* Styles for the footer */
 footer {
-  background-color: #f1f1f1;
-  text-align: center;
-  padding: 1em;
-  color: #333;
-  width: 100%;
-  position: relative;
-  bottom: 0;
+  background-color: #f1f1f1; /* Sets the background color */
+  text-align: center; /* Centers the text */
+  padding: 1em; /* Adds padding */
+  color: #333; /* Sets the text color */
+  width: 100%; /* Ensures the footer takes full width */
+  position: relative; /* Allows positioning relative to other elements */
+  bottom: 0; /* Positions the footer at the bottom */
 }
 
 footer p {
-  margin: 0;
-  padding-top: 0.3em;
+  margin: 0; /* Removes default margin */
+  padding-top: 0.3em; /* Adds top padding */
 }
 
-.home-button {
-  background-color: purple;
+/* Styles for index.html */
+/* Card container styling */
+.custom-card {
+  max-width: 800px; /* Sets maximum width */
+  margin: auto; /* Centers the card */
+}
+
+/* Form container styling */
+.form-container {
+  display: flex; /* Sets a flexbox layout */
+  flex-direction: column; /* Arranges children in a column */
+  gap: 1em; /* Adds space between children */
+}
+
+/* Label styling */
+label {
+  font-weight: bold; /* Sets the font weight to bold */
+}
+
+/* Alert Styles */
+/* Styles for alert messages */
+.alert {
+  margin-bottom: 1em; /* Adds bottom margin */
+  padding: 1em; /* Adds padding */
+  border: 1px solid transparent; /* Sets transparent border */
+  border-radius: 4px; /* Rounds the corners */
+}
+
+/* Danger alert styling */
+.alert-danger {
+  color: #721c24; /* Sets text color */
+  background-color: #f8d7da; /* Sets background color */
+  border-color: #f5c6cb; /* Sets border color */
+}
+
+/* Styles for result.html */
+/* Download card container styling */
+.custom-card-download {
+  max-width: 800px; /* Sets maximum width */
+  margin: 20px auto; /* Adds top and bottom margin, centers the card */
+}
+
+/* Image styling */
+.img-fluid {
+  width: 100%; /* Ensures the image takes full width of its container */
+  height: auto; /* Maintains aspect ratio */
+}
+
+/* Card body styling */
+.card-body {
+  display: flex; /* Sets a flexbox layout */
+  flex-direction: column; /* Arranges children in a column */
+  justify-content: center; /* Centers children vertically */
+}
+
+/* Card title styling */
+.card-title {
+  font-size: 1.25rem; /* Sets the font size */
+}
+
+/* Card text styling */
+.card-text {
+  display: flex; /* Sets a flexbox layout */
+  flex-wrap: nowrap; /* Prevents wrapping to the next line */
+  gap: 0.5em; /* Adds space between children */
+  align-items: center; /* Centers children vertically */
+  font-size: 1rem; /* Sets the font size */
+}
+
+/* Prevents text wrapping */
+.card-text span {
+  white-space: nowrap; /* Prevents wrapping to the next line */
+}
+
+/* Button styling */
+.btn-success {
+  margin-top: 10px; /* Adds top margin */
 }
