@@ -96,6 +96,12 @@ label {
 
 /* Styles for result.html */
 /* Download card container styling */
+
+.result-custom-card {
+  max-width: 800px; /* Sets maximum width */
+  margin: 1px auto; /* Adds top and bottom margin, centers the card */
+}
+
 .custom-card-download {
   max-width: 800px; /* Sets maximum width */
   margin: 1px auto; /* Adds top and bottom margin, centers the card */
