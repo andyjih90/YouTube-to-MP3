@@ -1,7 +1,7 @@
 /* Global Styles */
 /* Basic styles applied to the entire page */
 body {
-  font-family: cursive; /* Sets the font family for the entire page */
+  font-family: "Oswald", sans-serif; /* Sets the font family for the entire page */
   margin: 0; /* Removes default margin */
   padding: 0; /* Removes default padding */
   display: flex; /* Sets a flexbox layout for the body */
@@ -98,7 +98,7 @@ label {
 /* Download card container styling */
 .custom-card-download {
   max-width: 800px; /* Sets maximum width */
-  margin: 20px auto; /* Adds top and bottom margin, centers the card */
+  margin: 1px auto; /* Adds top and bottom margin, centers the card */
 }
 
 /* Image styling */
