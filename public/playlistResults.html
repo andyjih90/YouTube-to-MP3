@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Your Playlist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .download-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="d-flex align-items-center justify-content-between">
+        <nav>
+            <a href="/" class="btn btn-dark home-button">Home</a>
+            <a href="/playlist.html" class="btn btn-dark home-button">Convert Playlist</a>
+        </nav>
+        <h2 class="title-font text-dark">YouTube Playlist to MP3 Converter</h2>
+        <div></div>
+    </header>
+    <main>
+        <div class="row gap-4">
+            <!-- Conversion Form -->
+            <div class="card result-custom-card container-fluid">
+                <div class="card-body">
+                    <div id="error-message"></div>
+                    <form id="convertForm" class="form-container d-flex flex-column gap-2">
+                        <div class="mb-3">
+                            <label for="youtube-url" class="form-label">Enter YouTube URL:</label>
+                            <input type="text" class="form-control" id="youtube-url" name="youtube-url" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Convert</button>
+                    </form>
+                    <div id="progressBar" class="progress mt-3 hidden">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                            style="width: 0%;"></div>
+                    </div>
+                    <p id="status" class="mt-2"></p>
+                </div>
+            </div>
+
+            <!-- Download List for Playlist -->
+            <div class="card custom-card-download container-fluid">
+                <div class="card-body">
+                    <h3>Download Links</h3>
+                    <div id="downloadLinks" class="list-group download-list"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 YouTube to MP3 Converter</p>
+    </footer>
+    <script>
+        document.getElementById('convertForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            startConversion();
+        });
+
+        const resetForm = () => {
+            const progressBarContainer = document.getElementById('progressBar');
+            const progressBar = document.querySelector('.progress-bar');
+            const status = document.getElementById('status');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            progressBarContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            status.innerText = '';
+            errorMessageDiv.innerHTML = '';
+        };
+
+        const startConversion = () => {
+            resetForm();
+
+            const videoUrl = document.getElementById('youtube-url').value;
+            const progressBarContainer = document.getElementById('progressBar');
+            const progressBar = document.querySelector('.progress-bar');
+            const status = document.getElementById('status');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            progressBarContainer.classList.remove('hidden');
+            status.innerText = 'Starting conversion...';
+
+            let progress = 0;
+            const fakeProgressInterval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+
+                if (progress >= 90) {
+                    clearInterval(fakeProgressInterval);
+                }
+            }, 1000);
+
+            fetch('/convert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'youtube-url': videoUrl })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Please enter a valid link.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const checkCompletion = setInterval(() => {
+                        fetch('/status')
+                            .then(response => response.json())
+                            .then(statusData => {
+                                if (!statusData.conversionInProgress) {
+                                    clearInterval(checkCompletion);
+                                    progressBar.style.width = '100%';
+                                    status.innerText = 'Conversion completed! Redirecting to download...';
+                                    clearInterval(fakeProgressInterval);
+                                    setTimeout(() => {
+                                        resetForm();
+                                        window.location.href = data.downloadUrl;
+                                    }, 2000);
+                                } else {
+                                    const currentWidth = parseFloat(progressBar.style.width);
+                                    if (currentWidth < 90) {
+                                        progressBar.style.width = `${currentWidth + 10}%`;
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking status:', error);
+                                clearInterval(checkCompletion);
+                                clearInterval(fakeProgressInterval);
+                                progressBarContainer.classList.add('hidden');
+                                const errorMessage = document.createElement('div');
+                                errorMessage.className = 'alert alert-danger';
+                                errorMessage.textContent = `Error: ${error.message}`;
+                                errorMessageDiv.appendChild(errorMessage);
+                            });
+                    }, 1000);
+                })
+                .catch(error => {
+                    status.innerText = '';
+                    clearInterval(fakeProgressInterval);
+                    progressBarContainer.classList.add('hidden');
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'alert alert-danger';
+                    errorMessage.textContent = `Error: ${error.message}`;
+                    errorMessageDiv.appendChild(errorMessage);
+                });
+        };
+
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urls = urlParams.get('urls');
+        const error = urlParams.get('error');
+
+        if (error) {
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'alert alert-danger';
+            errorMessage.textContent = error;
+            document.getElementById('error-message').appendChild(errorMessage);
+        } else if (urls) {
+            const downloadLinksContainer = document.getElementById('downloadLinks');
+            JSON.parse(decodeURIComponent(urls)).forEach(url => {
+                const link = document.createElement('a');
+                link.href = url;
+                link.className = 'list-group-item list-group-item-action';
+                link.textContent = 'Download MP3';
+                downloadLinksContainer.appendChild(link);
+            });
+        }
+    </script>
+</body>
+
+</html>
